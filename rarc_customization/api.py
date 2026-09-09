@@ -65,8 +65,12 @@ def zip_files(files):
             target_path = os.path.join(target_dir, _file.file_name)
             target_path = get_unique_path(target_path)
 
+            content = _file.get_content()
+            if isinstance(content, str):
+                content = content.encode("utf-8")
+
             with open(target_path, "wb") as f:
-                f.write(_file.get_content())
+                f.write(content)
 
         zip_path_base = frappe.get_site_path("private", "files", f"files_{frappe.generate_hash(length=6)}")
         zip_path = shutil.make_archive(zip_path_base, "zip", temp_dir)
