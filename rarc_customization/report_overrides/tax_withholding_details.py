@@ -12,9 +12,10 @@ def execute_with_profit_center(filters=None):
     filters = filters or {}
 
     # Defensive default: agar from_date/to_date missing hain, to safe defaults set karo
+    # (dono ko string me consistent rakho taaki type mismatch na ho)
     if not filters.get("from_date") or not filters.get("to_date"):
-        filters["from_date"] = filters.get("from_date") or get_first_day(nowdate())
-        filters["to_date"] = filters.get("to_date") or nowdate()
+        filters["from_date"] = filters.get("from_date") or str(get_first_day(nowdate()))
+        filters["to_date"] = filters.get("to_date") or str(nowdate())
 
     columns, data = _original_execute(filters)
 
