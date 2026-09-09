@@ -1,5 +1,4 @@
 import frappe
-from frappe.utils import nowdate, get_first_day
 
 from erpnext.accounts.report.tax_withholding_details import (
     tax_withholding_details as core_twd,
@@ -11,15 +10,7 @@ _original_execute = core_twd.execute
 def execute_with_profit_center(filters=None):
     filters = filters or {}
 
-    # Defensive default: agar from_date/to_date missing hain, to safe defaults set karo
-    # (dono ko string me consistent rakho taaki type mismatch na ho)
-    if not filters.get("from_date") or not filters.get("to_date"):
-        filters["from_date"] = filters.get("from_date") or str(get_first_day(nowdate()))
-        filters["to_date"] = filters.get("to_date") or str(nowdate())
-
-    columns, data = _original_execute(filters)
-
-    columns.extend([
+    columns = [
         {
             "label": "Profit Center",
             "fieldname": "profit_center",
@@ -27,13 +18,15 @@ def execute_with_profit_center(filters=None):
             "options": "Profit Center",
             "width": 130,
         },
-        {
-            "label": "Profit Center Name",
-            "fieldname": "profit_center_name",
-            "fieldtype": "Data",
-            "width": 150,
-        },
-    ])
+    ]
+
+    # Agar zaroori filters (company/from_date/to_date) abhi tak set nahi hue,
+    # to report ko force mat karo — empty result do
+    if not filters.get("company") or not filters.get("from_date") or not filters.get("to_date"):
+        return columns, []
+
+    columns_from_core, data = _original_execute(filters)
+    columns = columns_from_core + columns
 
     pi_names = {
         row.get("ref_no")
@@ -51,26 +44,11 @@ def execute_with_profit_center(filters=None):
         )
         profit_center_map = {pi.name: pi.profit_center for pi in pi_rows}
 
-    profit_center_ids = {pc for pc in profit_center_map.values() if pc}
-
-    profit_center_name_map = {}
-    if profit_center_ids:
-        pc_rows = frappe.get_all(
-            "Profit Center",
-            filters={"name": ["in", list(profit_center_ids)]},
-            fields=["name", "profit_center_name"],
-            limit_page_length=0,
-        )
-        profit_center_name_map = {pc.name: pc.profit_center_name for pc in pc_rows}
-
     for row in data:
         if row.get("transaction_type") == "Purchase Invoice":
-            pc = profit_center_map.get(row.get("ref_no"))
-            row["profit_center"] = pc
-            row["profit_center_name"] = profit_center_name_map.get(pc) if pc else None
+            row["profit_center"] = profit_center_map.get(row.get("ref_no"))
         else:
             row["profit_center"] = None
-            row["profit_center_name"] = None
 
     selected_profit_center = filters.get("profit_center")
     if selected_profit_center:
