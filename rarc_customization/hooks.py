@@ -1,3 +1,5 @@
+import frappe
+
 app_name = "rarc_customization"
 app_title = "rarc_customization"
 app_publisher = "Anshu Sharma"
@@ -27,6 +29,7 @@ app_license = "mit"
 # include js, css files in header of desk.html
 # app_include_css = "/assets/rarc_customization/css/rarc_customization.css"
 # app_include_js = "/assets/rarc_customization/js/rarc_customization.js"
+app_include_js = ["/assets/rarc_customization/js/rarc_twd_filter.js"]
 
 # include js, css files in header of web template
 # web_include_css = "/assets/rarc_customization/css/rarc_customization.css"
@@ -143,13 +146,14 @@ app_license = "mit"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+    "Purchase Invoice": {
+        "validate": "rarc_customization.purchase_invoice_hooks.set_profit_center_and_itc"
+    },
+    "Sales Invoice": {
+        "validate": "rarc_customization.sales_invoice_hooks.set_profit_center_in_child_tables"
+    }
+}
 
 # Scheduled Tasks
 # ---------------
@@ -253,3 +257,21 @@ app_license = "mit"
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
 
+
+doctype_list_js = {
+    "File": "public/js/file_list.js"
+}
+
+doctype_js = {
+    "Purchase Invoice": "public/js/purchase_invoice.js",
+    "Sales Invoice": "public/js/sales_invoice.js"
+}
+
+# Report Overrides
+# -----------------
+# Adds Profit Center column to standard "Tax Withholding Details" report
+try:
+    from rarc_customization.report_overrides.tax_withholding_details import apply_patch
+    apply_patch()
+except Exception:
+    frappe.log_error(title="rarc_customization: report override failed")
