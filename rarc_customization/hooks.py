@@ -29,7 +29,11 @@ app_license = "mit"
 # include js, css files in header of desk.html
 # app_include_css = "/assets/rarc_customization/css/rarc_customization.css"
 # app_include_js = "/assets/rarc_customization/js/rarc_customization.js"
-app_include_js = ["/assets/rarc_customization/js/rarc_twd_filter.js"]
+app_include_js = [
+	"/assets/rarc_customization/js/rarc_twd_filter.js",
+	"/assets/rarc_customization/js/rarc_customization/expense.js",
+	"/assets/rarc_customization/js/workflow_action_tracking.js"
+]
 
 # include js, css files in header of web template
 # web_include_css = "/assets/rarc_customization/css/rarc_customization.css"
@@ -148,10 +152,30 @@ app_include_js = ["/assets/rarc_customization/js/rarc_twd_filter.js"]
 
 doc_events = {
     "Purchase Invoice": {
-        "validate": "rarc_customization.purchase_invoice_hooks.set_profit_center_and_itc"
+        "validate": [
+            "rarc_customization.purchase_invoice_hooks.set_profit_center_and_itc",
+            "rarc_customization.customizations.department.validate.validate_department_gl"
+        ],
+        "on_update": [
+            "rarc_customization.customizations.workflow.workflow_timeline.track_state_user"
+        ]
+    },
+    "Purchase Order": {
+        "validate": "rarc_customization.customizations.department.validate.validate_department_gl"
+    },
+    "Purchase Receipt": {
+        "validate": "rarc_customization.customizations.department.validate.validate_department_gl"
+    },
+    "Material Request": {
+        "validate": "rarc_customization.customizations.department.validate.validate_department_gl"
     },
     "Sales Invoice": {
         "validate": "rarc_customization.sales_invoice_hooks.set_profit_center_in_child_tables"
+    },
+    "Workflow": {
+        "on_update": [
+            "rarc_customization.customizations.workflow.install.create_workflow_tracking_fields"
+        ]
     }
 }
 
@@ -264,7 +288,10 @@ doctype_list_js = {
 
 doctype_js = {
     "Purchase Invoice": "public/js/purchase_invoice.js",
-    "Sales Invoice": "public/js/sales_invoice.js"
+    "Sales Invoice": "public/js/sales_invoice.js",
+    "Purchase Order": "public/js/purchase_order.js",
+    "Purchase Receipt": "public/js/purchase_receipt.js",
+    "Material Request": "public/js/material_request.js"
 }
 
 # Report Overrides

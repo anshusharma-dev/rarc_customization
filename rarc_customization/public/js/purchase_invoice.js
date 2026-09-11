@@ -4,6 +4,10 @@ frappe.ui.form.on('Purchase Invoice', {
         set_itc_ineligible_if_trust(frm);
     },
 
+    onload_post_render: function(frm) {
+        rarc_customization.utils.filter_expense_account(frm);
+    },
+
     refresh: function(frm) {
         set_itc_ineligible_if_trust(frm);
     },
@@ -14,6 +18,10 @@ frappe.ui.form.on('Purchase Invoice', {
 
     company: function(frm) {
         set_itc_ineligible_if_trust(frm);
+    },
+
+    custom_department: function(frm) {
+        rarc_customization.utils.filter_expense_account(frm);
     }
 });
 
@@ -30,6 +38,13 @@ frappe.ui.form.on('Purchase Invoice Item', {
         if (is_trust_company(frm.doc.company)) {
             frappe.model.set_value(cdt, cdn, 'is_ineligible_for_itc', 1);
         }
+    },
+
+    item_code: function(frm, cdt, cdn) {
+        setTimeout(() => {
+            rarc_customization.utils.set_expense_account(frm, cdt, cdn);
+            rarc_customization.utils.filter_expense_account(frm);
+        }, 1000);
     }
 });
 
