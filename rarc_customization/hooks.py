@@ -291,7 +291,8 @@ doctype_js = {
     "Sales Invoice": "public/js/sales_invoice.js",
     "Purchase Order": "public/js/purchase_order.js",
     "Purchase Receipt": "public/js/purchase_receipt.js",
-    "Material Request": "public/js/material_request.js"
+    "Material Request": "public/js/material_request.js",
+    "Journal Entry": "public/js/journal_entry.js",
 }
 
 # Report Overrides
