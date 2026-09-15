@@ -1,0 +1,136 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-09-15 17:20:27.641771",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_row",
+  "party_type",
+  "tax_withholding_category",
+  "tax_rate",
+  "taxable_doctype",
+  "taxable_date",
+  "withholding_name",
+  "conversion_rate",
+  "column_break_qsqr",
+  "item_code",
+  "party",
+  "taxable_amount",
+  "withholding_amount",
+  "taxable_name",
+  "withholding_doctype",
+  "withholding_date",
+  "status"
+ ],
+ "fields": [
+  {
+   "fieldname": "item_row",
+   "fieldtype": "Data",
+   "label": "item_row"
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "label": "item_code",
+   "options": "Item"
+  },
+  {
+   "default": "Customer",
+   "fieldname": "party_type",
+   "fieldtype": "Select",
+   "label": "party_type",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "column_break_qsqr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "party",
+   "fieldtype": "Link",
+   "label": "party",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "tax_withholding_category",
+   "fieldtype": "Link",
+   "label": "tax_withholding_category",
+   "options": "Tax Withholding Category"
+  },
+  {
+   "fieldname": "taxable_amount",
+   "fieldtype": "Currency",
+   "label": "taxable_amount"
+  },
+  {
+   "fieldname": "tax_rate",
+   "fieldtype": "Percent",
+   "label": "tax_rate"
+  },
+  {
+   "fieldname": "withholding_amount",
+   "fieldtype": "Currency",
+   "label": "withholding_amount"
+  },
+  {
+   "default": "Sales Invoice",
+   "fieldname": "taxable_doctype",
+   "fieldtype": "Data",
+   "label": "taxable_doctype"
+  },
+  {
+   "fieldname": "taxable_name",
+   "fieldtype": "Data",
+   "label": "taxable_name"
+  },
+  {
+   "fieldname": "taxable_date",
+   "fieldtype": "Date",
+   "label": "taxable_date"
+  },
+  {
+   "default": "Sales Invoice",
+   "fieldname": "withholding_doctype",
+   "fieldtype": "Data",
+   "label": "withholding_doctype"
+  },
+  {
+   "fieldname": "withholding_name",
+   "fieldtype": "Data",
+   "label": "withholding_name"
+  },
+  {
+   "fieldname": "conversion_rate",
+   "fieldtype": "Float",
+   "label": "conversion_rate"
+  },
+  {
+   "fieldname": "withholding_date",
+   "fieldtype": "Date",
+   "label": "withholding_date"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "status",
+   "options": "Draft\nUnallocated\nAllocated\nSettled\nOver Withheld\nDuplicate"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-09-15 17:28:06.620900",
+ "modified_by": "Administrator",
+ "module": "rarc_customization",
+ "name": "Item Tax Withholding Detail",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

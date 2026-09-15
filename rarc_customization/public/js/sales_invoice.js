@@ -13,6 +13,10 @@ frappe.ui.form.on('Sales Invoice', {
 
     project: function(frm) {
         set_project_in_child_tables(frm);
+    },
+
+    customer: function(frm) {
+        toggle_apply_tds_visibility(frm);
     }
 });
 
@@ -104,4 +108,13 @@ function set_project_in_child_tables(frm) {
         row.project = frm.doc.project;
     });
     frm.refresh_field('taxes');
+}
+
+function toggle_apply_tds_visibility(frm) {
+    if (!frm.doc.customer) return;
+    frappe.db.get_value("Customer", frm.doc.customer, "tax_withholding_category", (r) => {
+        frm.fields_dict.items.grid.update_docfield_property(
+            "custom_apply_tds", "hidden", r.tax_withholding_category ? 0 : 1
+        );
+    });
 }

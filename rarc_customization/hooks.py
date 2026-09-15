@@ -170,7 +170,10 @@ doc_events = {
         "validate": "rarc_customization.customizations.department.validate.validate_department_gl"
     },
     "Sales Invoice": {
-        "validate": "rarc_customization.sales_invoice_hooks.set_profit_center_in_child_tables"
+        "validate": [
+            "rarc_customization.sales_invoice_hooks.set_profit_center_in_child_tables",
+            "rarc_customization.customizations.tax_withholding.validate.set_item_wise_tax_withholding"
+        ]
     },
     "Workflow": {
         "on_update": [
