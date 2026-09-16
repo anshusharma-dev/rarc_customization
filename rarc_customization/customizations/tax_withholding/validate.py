@@ -1,6 +1,7 @@
 import frappe
 from erpnext.accounts.doctype.tax_withholding_category.tax_withholding_category import (
     get_party_tax_withholding_details,
+    get_tax_withholding_details,
 )
 
 
@@ -27,13 +28,24 @@ def set_item_wise_tax_withholding(doc, method=None):
     finally:
         doc.grand_total = original_grand_total
 
-    if not tax_row or not tax_row.get("tax_amount"):
+    if not tax_row:
         return
 
     doc.append("taxes", tax_row)
 
+    tax_config = get_tax_withholding_details(category, doc.posting_date, doc.company)
+    nominal_rate = tax_config.get("rate") if tax_config else 0
+
+    doc.calculate_taxes_and_totals()
+
+    resolved_row = next((t for t in doc.taxes if t.account_head == tax_row["account_head"]), None)
+    resolved_tax_amount = resolved_row.tax_amount if resolved_row else 0
+
+    if not resolved_tax_amount:
+        return
+
     for item in tds_items:
-        item_share = (item.amount / tds_items_amount) * tax_row["tax_amount"]
+        item_share = (item.amount / tds_items_amount) * resolved_tax_amount
         doc.append("custom_tax_withholding_entries", {
             "item_row": item.name,
             "item_code": item.item_code,
@@ -41,7 +53,7 @@ def set_item_wise_tax_withholding(doc, method=None):
             "party": doc.customer,
             "tax_withholding_category": category,
             "taxable_amount": item.amount,
-            "tax_rate": tax_row.get("rate"),
+            "tax_rate": nominal_rate,
             "withholding_amount": item_share,
             "taxable_doctype": "Sales Invoice",
             "taxable_name": doc.name,
@@ -52,5 +64,3 @@ def set_item_wise_tax_withholding(doc, method=None):
             "conversion_rate": doc.conversion_rate or 1,
             "status": "Settled" if doc.docstatus == 1 else "Draft",
         })
-
-    doc.calculate_taxes_and_totals()
