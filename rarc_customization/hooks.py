@@ -153,8 +153,10 @@ app_include_js = [
 doc_events = {
     "Purchase Invoice": {
         "validate": [
+            "rarc_customization.customizations.item_tax_template.validate.set_item_tax_template",
             "rarc_customization.purchase_invoice_hooks.set_profit_center_and_itc",
-            "rarc_customization.customizations.department.validate.validate_department_gl"
+            "rarc_customization.customizations.department.validate.validate_department_gl",
+            "rarc_customization.customizations.posting_date_lock.validate.preserve_posting_date"
         ],
         "on_update": [
             "rarc_customization.customizations.workflow.workflow_timeline.track_state_user"
@@ -171,14 +173,21 @@ doc_events = {
     },
     "Sales Invoice": {
         "validate": [
+            "rarc_customization.customizations.item_tax_template.validate.set_item_tax_template",
             "rarc_customization.sales_invoice_hooks.set_profit_center_in_child_tables",
-            "rarc_customization.customizations.tax_withholding.validate.set_item_wise_tax_withholding"
+            "rarc_customization.customizations.tax_withholding.validate.set_item_wise_tax_withholding",
+            "rarc_customization.customizations.posting_date_lock.validate.preserve_posting_date"
         ]
     },
-    "Workflow": {
+        "Workflow": {
         "on_update": [
             "rarc_customization.customizations.workflow.install.create_workflow_tracking_fields"
         ]
+    },
+    "Accounting Dimension": {
+        "after_insert": "rarc_customization.customizations.accounting_dimension.sync.sync_parent_field",
+        "on_update": "rarc_customization.customizations.accounting_dimension.sync.sync_parent_field",
+        "on_trash": "rarc_customization.customizations.accounting_dimension.sync.remove_parent_field",
     }
 }
 
@@ -306,3 +315,11 @@ try:
     apply_patch()
 except Exception:
     frappe.log_error(title="rarc_customization: report override failed")
+
+# Adds Profit Center + Profit Center Name columns to "Accounts Receivable"
+# and "Accounts Payable" reports (both use the same ReceivablePayableReport class)
+try:
+    from rarc_customization.report_overrides.receivable_payable import apply_patch as apply_ar_ap_patch
+    apply_ar_ap_patch()
+except Exception:
+    frappe.log_error(title="rarc_customization: AR/AP report override failed")
