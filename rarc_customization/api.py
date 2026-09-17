@@ -65,8 +65,17 @@ def zip_files(files):
             target_path = os.path.join(target_dir, _file.file_name)
             target_path = get_unique_path(target_path)
 
+            try:
+                content = _file.get_content()
+            except Exception as e:
+                frappe.log_error(
+                    title="Missing File Skipped in zip_files",
+                    message=f"Could not read file {_file.file_url} (File: {_file.name}): {e}"
+                )
+                continue
+
             with open(target_path, "wb") as f:
-                f.write(_file.get_content())
+                f.write(content)
 
         zip_path_base = frappe.get_site_path("private", "files", f"files_{frappe.generate_hash(length=6)}")
         zip_path = shutil.make_archive(zip_path_base, "zip", temp_dir)
